@@ -1,5 +1,6 @@
 #include "helpers.h"
 #include "item.h"
+#include "to_string.h"
 
 #include <iostream>
 #include <memory>
@@ -14,17 +15,13 @@ bool is_valid_string(std::string const& str) {
 
 int compare_digits(std::string const& str, std::string const& oth);
 
-bool insert_before(std::string const& val, Item<std::string> const& oth) {
-	const int digit_cmp = compare_digits(val, oth.value);
-	return digit_cmp < 0 ? true : (digit_cmp > 0 ? false : val <= oth.value);
+bool insert_before(std::string const& val, Item<std::string> const& item) {
+	const int digit_cmp = compare_digits(val, item.value);
+	return digit_cmp < 0 ? true : (digit_cmp > 0 ? false : val <= item.value);
 }
 
 bool value_equal(Item<std::string> const& item, std::string const& val) {
 	return item.value == val;
-}
-
-std::string Item<std::string>::value_to_string() const {
-	return value;
 }
 
 int main() {

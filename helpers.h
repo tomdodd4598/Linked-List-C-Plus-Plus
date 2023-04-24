@@ -1,6 +1,7 @@
 #pragma once
 
 #include "item.h"
+#include "to_string.h"
 
 #include <functional>
 #include <iostream>
@@ -10,7 +11,7 @@
 
 template <typename T, typename U>
 void insert_item(std::unique_ptr<Item<T>>* start, U&& val, const std::function<bool(T const&, Item<T> const&)> insert_before) {
-	while (*start && !insert_before(val, **start)) {
+	while (*start != nullptr && !insert_before(val, **start)) {
 		start = &(*start)->next;
 	}
 	*start = std::make_unique<Item<T>>(std::forward<U>(val), std::move(*start));
@@ -18,15 +19,15 @@ void insert_item(std::unique_ptr<Item<T>>* start, U&& val, const std::function<b
 
 template <typename T, typename U>
 void remove_item(std::unique_ptr<Item<T>>* start, U&& val, const std::function<bool(Item<T> const&, T const&)> value_equal) {
-	while (*start && !value_equal(**start, val)) {
+	while (*start != nullptr && !value_equal(**start, val)) {
 		start = &(*start)->next;
 	}
 
-	if (*start) {
-		*start = std::move((*start)->next);
+	if (*start == nullptr) {
+		std::cout << "Item " << to_string(val) << " does not exist!\n";
 	}
 	else {
-		std::cout << "Item " << val << " does not exist!\n";
+		*start = std::move((*start)->next);
 	}
 }
 
@@ -70,12 +71,12 @@ template <typename T>
 void print_fold(Item<T> const* start) {
 	const auto f_some = [](Item<T> const* current, Item<T> const* next, std::string&& accumulator) {
 		std::ostringstream sstream;
-		sstream << std::move(accumulator) << current->value_to_string() << ", ";
+		sstream << std::move(accumulator) << to_string(current->value) << ", ";
 		return sstream.str();
 	};
 	const auto f_last = [](Item<T> const* current, std::string&& accumulator) {
 		std::ostringstream sstream;
-		sstream << std::move(accumulator) << current->value_to_string() << '\n';
+		sstream << std::move(accumulator) << to_string(current->value) << '\n';
 		return sstream.str();
 	};
 	const auto f_empty = [](std::string&& accumulator) { return std::move(accumulator); };
@@ -86,12 +87,12 @@ template <typename T>
 void print_foldback(Item<T> const* start) {
 	const auto f_some = [](Item<T> const* current, Item<T> const* next, std::string&& inner_val) {
 		std::ostringstream sstream;
-		sstream << current->value_to_string() << ", " << std::move(inner_val);
+		sstream << to_string(current->value) << ", " << std::move(inner_val);
 		return sstream.str();
 	};
 	const auto f_last = [](Item<T> const* current) {
 		std::ostringstream sstream;
-		sstream << current->value_to_string() << '\n';
+		sstream << to_string(current->value) << '\n';
 		return sstream.str();
 	};
 	const auto f_empty = []() { return ""; };

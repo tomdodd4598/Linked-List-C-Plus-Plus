@@ -1,6 +1,7 @@
 #pragma once
 
 #include "iterator.h"
+#include "to_string.h"
 
 #include <functional>
 #include <iostream>
@@ -16,11 +17,11 @@ struct Item {
 
 	template <typename U>
 	Item<T>(U&& val, std::unique_ptr<Item<T>>&& nxt) : value{ std::forward<U>(val) }, next{ std::move(nxt) } {
-		std::cout << "Creating item: " << value_to_string() << '\n';
+		std::cout << "Creating item: " << to_string(value) << '\n';
 	}
 
 	~Item<T>() {
-		std::cout << "Deleting item: " << value_to_string() << '\n';
+		std::cout << "Deleting item: " << to_string(value) << '\n';
 	}
 
 	Item<T>(Item<T> const& oth) = delete;
@@ -45,10 +46,8 @@ struct Item {
 		return *item;
 	}
 
-	std::string value_to_string() const;
-
 	Item<T>* print_get_next() const {
-		std::cout << value_to_string() << (next != nullptr ? ", " : "\n");
+		std::cout << to_string(value) << (next != nullptr ? ", " : "\n");
 		return next.get();
 	}
 
